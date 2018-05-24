@@ -24,8 +24,8 @@ const LoginScreen = () => {
             <Input placeholder="Password" />
           </Item>
         </Form>
-        <Button full primary>
-          <Text onPress={() => Actions.home()}>Login</Text>
+        <Button full primary onPress={() => Actions.home()}>
+          <Text>Login</Text>
         </Button>
       </Content>
     </Container>

@@ -3,6 +3,7 @@ import { Router, Scene } from 'react-native-router-flux';
 import { StyleSheet, Text } from 'react-native';
 import LoginScreen from './Screens/Login';
 import HomeScreen from './Screens/Home';
+import VehicleScreen from './Screens/Vehicle';
 
 const TabIcon = ({ selected, title }) => {
   return (
@@ -31,6 +32,11 @@ export default class App extends React.Component {
               key="home"
               component={HomeScreen}
               title="Home"
+            />
+            <Scene
+              key="vehicle"
+              component={VehicleScreen}
+              title="Vehicle Information"
             />
         </Scene>
       </Router>

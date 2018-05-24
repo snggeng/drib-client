@@ -4,9 +4,11 @@ import {
   Text,
   View,
   Animated,
+  TouchableHighlight,
 } from 'react-native';
 import { Container, Header, Left, Body, Right, Title } from 'native-base';
-import { MapView} from 'expo';
+import { MapView } from 'expo';
+import { Actions } from 'react-native-router-flux';
 
 export const getCurrentLocation = () => {
   return new Promise((resolve, reject) => {
@@ -33,9 +35,7 @@ class HomeScreen extends Component {
   }
 
   async componentDidMount() {
-    console.log('comp will mount')
     return await getCurrentLocation().then( async (position) => {
-      console.log('position', position)
       if (position) {
         await this.setState({
           region: {
@@ -60,12 +60,19 @@ class HomeScreen extends Component {
     })
   }
 
+  handlePress = (e) => {
+    Actions.vehicle()
+  }
+
   render() {
     const { region } = this.state;
     return (
       <Container>
-        <Text style={styles.welcome}>
-          Home Screen
+        <Text style={styles.header}>
+          D R I B
+        </Text>
+        <Text style={styles.subheader}>
+          Enable Location Services
         </Text>
         <MapView
           ref={map => {this.map = map}}
@@ -86,10 +93,18 @@ class HomeScreen extends Component {
             coordinate={marker.latlng}
             title={marker.title}
             description={marker.description}
+            onCalloutPress={this.handlePress}
           >
-            <Animated.View style={[styles.markerWrap]}>
-              <Animated.View style={[styles.ring]} />
-              <View style={styles.marker} />
+            <Animated.View style={styles.markerWrap}>
+              <Animated.View style={styles.ring} />
+              <MapView.Callout tooltip>
+                <TouchableHighlight underlayColor='#dddddd'>
+                    <View style={styles.marker}>
+                        <Text>{marker.title}{"\n"}{marker.description}</Text>
+                    </View>
+                </TouchableHighlight>
+              </MapView.Callout>
+              {/* <View style={styles.marker} onPress={() => Actions.vehicle()}/> */}
             </Animated.View>
           </MapView.Marker>
         ))}
@@ -100,17 +115,17 @@ class HomeScreen extends Component {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#bb00cc',
+  header: {
+    fontSize: 40,
+    textAlign: 'center',
+    color: '#000',
+    backgroundColor: '#fff'
   },
-  welcome: {
+  subheader: {
     fontSize: 20,
     textAlign: 'center',
-    margin: 10,
-    color: '#000000',
+    color: '#fff',
+    backgroundColor: 'purple'
   },
   markerWrap: {
     alignItems: "center",
