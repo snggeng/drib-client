@@ -22,10 +22,83 @@ class HomeScreen extends Component {
     super(props)
     this.map = null;
     this.state = {
-      markers: [{latlng: {latitude: 37.40113, longitude: -122.0577}, title: 'car 1', description: 'Tesla'},
-                {latlng: {latitude: 37.40501, longitude: -122.0771}, title: 'car 2', description: 'Honda'},
-                {latlng: {latitude: 37.40501, longitude: -122.0500}, title: 'car 3', description: 'BMW'},
-                {latlng: {latitude: 37.40123, longitude: -122.0587}, title: 'car 4', description: 'Tesla'}],
+      vehicles: [{
+          id: 123,
+          odometer: {
+              distance: 123
+          },
+          vin: "5XXGN4A72EG347600",
+          info: {
+              make: "TESLA",
+              model: "Model S",
+              year: 2014
+          },
+          location: {
+              latitude: 37.40113,
+              longitude: -122.0577
+          },
+          battery: {
+              percentRemaining: 0.3,
+              range: 40.5
+          }
+      }, {
+          id: 124,
+          odometer: {
+              distance: 124
+          },
+          vin: "5XXGSH2A72EG351230",
+          info: {
+              make: "HONDA",
+              model: "Odyssey",
+              year: 2015
+          },
+          location: {
+              latitude: 37.40501,
+              longitude: -122.0771
+          },
+          battery: {
+              percentRemaining: 0.5,
+              range: 40.5
+          }
+      }, {
+          id: 125,
+          odometer: {
+              distance: 125
+          },
+          vin: "5XXJIJ2A72GS312524",
+          info: {
+              make: "BMW",
+              model: "X5",
+              year: 2018
+          },
+          location: {
+              latitude: 37.40501,
+              longitude: -122.0500
+          },
+          battery: {
+              percentRemaining: 0.7,
+              range: 45.5
+          }
+      }, {
+          id: 126,
+          odometer: {
+              distance: 126
+          },
+          vin: "5XXREJ2Y72DS344433",
+          info: {
+              make: "CHRYSLER",
+              model: "Pacifica",
+              year: 2018
+          },
+          location: {
+              latitude: 37.40123,
+              longitude: -122.0587
+          },
+          battery: {
+              percentRemaining: 0.9,
+              range: 50.5
+          }
+      }],
       region: {
           latitude: null,
           longitude: null,
@@ -60,10 +133,9 @@ class HomeScreen extends Component {
     })
   }
 
-  handlePress = (e) => {
-    // console.log(ReactNativeComponentTree.getInstanceFromNode(e.target))
-    // console.log('s')
-    // Actions.vehicle(marker)
+  handlePress = (marker) => {
+    // pass marker into vehicle info screen
+    Actions.vehicle({ marker })
   }
 
   render() {
@@ -89,24 +161,25 @@ class HomeScreen extends Component {
           showsMyLocationButton={true}
           showsUserLocation={true}
         >
-        {this.state.markers.map((marker, index) => (
+        {/* {this.state.vehicles.map((v, i) => (<Text>{v.vin}</Text>))} */}
+        {this.state.vehicles.map((marker, index) => (
           <MapView.Marker
             key={index}
-            coordinate={marker.latlng}
-            title={marker.title}
-            description={marker.description}
-            onCalloutPress={this.handlePress}
+            id={index}
+            coordinate={marker.location}
+            title={marker.info.make}
+            description={`${marker.info.model} ${marker.info.year}`}
+            onCalloutPress={() => this.handlePress(marker, index)}
           >
             <Animated.View style={styles.markerWrap}>
               <Animated.View style={styles.ring} />
-              <MapView.Callout tooltip>
-                <TouchableHighlight underlayColor='#dddddd'>
-                    <View style={styles.marker}>
-                        <Text>{marker.title}{"\n"}{marker.description}</Text>
+              <MapView.Callout tooltip marker={marker}>
+                <TouchableHighlight underlayColor='#dddddd' marker={marker}>
+                    <View style={styles.marker} marker={marker}>
+                        <Text>{`${marker.info.make} \n ${marker.info.model} ${marker.info.year}`}</Text>
                     </View>
                 </TouchableHighlight>
               </MapView.Callout>
-              {/* <View style={styles.marker} onPress={() => Actions.vehicle()}/> */}
             </Animated.View>
           </MapView.Marker>
         ))}
