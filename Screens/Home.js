@@ -6,6 +6,7 @@ import {
   Animated,
   TouchableHighlight,
 } from 'react-native';
+import ReactNativeComponentTree from 'react-native/Libraries/Renderer/shims/ReactNativeComponentTree';
 import { Container, Header, Left, Body, Right, Title } from 'native-base';
 import { MapView } from 'expo';
 import { Actions } from 'react-native-router-flux';
@@ -50,7 +51,6 @@ class HomeScreen extends Component {
   }
 
   handleCenter = () => {
-    console.log('handle center')
     const { latitude, longitude, latitudeDelta, longitudeDelta } = this.state.region;
     this.map.animateToRegion({
       latitude,
@@ -61,7 +61,9 @@ class HomeScreen extends Component {
   }
 
   handlePress = (e) => {
-    Actions.vehicle()
+    // console.log(ReactNativeComponentTree.getInstanceFromNode(e.target))
+    // console.log('s')
+    // Actions.vehicle(marker)
   }
 
   render() {

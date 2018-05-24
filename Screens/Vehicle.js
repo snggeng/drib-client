@@ -11,7 +11,7 @@ const VehicleScreen = () => {
     <Container>
       <Content>
         <Grid>
-            <Col style={{ backgroundColor: '#635DB7', height: 200 }}></Col>
+            <Col style={{ backgroundColor: '#635DB7', height: 200 }}>{this.props.marker.title}</Col>
             <Col style={{ backgroundColor: '#00CE9F', height: 200 }}></Col>
           </Grid>
       </Content>
