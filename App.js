@@ -11,16 +11,17 @@ const TabIcon = ({ selected, title }) => {
 }
 
 export default class App extends React.Component {
+  async componentWillMount() {
+    await Expo.Font.loadAsync({
+      'Roboto': require('native-base/Fonts/Roboto.ttf'),
+      'Roboto_medium': require('native-base/Fonts/Roboto_medium.ttf'),
+    });
+  }
+  
   render() {
     return (
        <Router>
         <Scene key="root">
-          <Scene
-            key="tabbar"
-            tabs={true}
-            tabBarStyle={{ backgroundColor: '#FFFFFF' }}
-          >
-          <Scene key="tab1" title="TAB1" icon={TabIcon}>
             <Scene key="login"
               component={LoginScreen}
               title="Login"
@@ -31,21 +32,6 @@ export default class App extends React.Component {
               component={HomeScreen}
               title="Home"
             />
-          </Scene>
-
-          <Scene key="tab2" title="TAB2" icon={TabIcon}>
-            <Scene key="login"
-              component={LoginScreen}
-              title="Login"
-              initial
-            />
-            <Scene
-              key="home"
-              component={HomeScreen}
-              title="Home"
-            />
-          </Scene>
-          </Scene>
         </Scene>
       </Router>
     );
