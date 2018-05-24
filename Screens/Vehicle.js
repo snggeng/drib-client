@@ -3,8 +3,9 @@ import {
   StyleSheet,
   Animated,
   View,
+  Text,
 } from 'react-native';
-import { Container, Header, Content, Button, Text, Item, } from 'native-base';
+import { Container, Header, Content, Button, Item, Icon, Badge } from 'native-base';
 import { Col, Row, Grid } from 'react-native-easy-grid';
 import { MapView } from 'expo';
 import { Actions } from 'react-native-router-flux';
@@ -13,12 +14,32 @@ class VehicleScreen extends Component {
     constructor(props) {
         super(props)
     }
+
+    renderBatteryRemaining = (battery) => {
+        switch(true) {
+            case battery.percentRemaining === 0:
+            return (<Icon type='FontAwesome' name='battery-empty'/>);
+            break;
+            case battery.percentRemaining <= 0.25:
+            return (<Icon type='FontAwesome' name='battery-quarter'/>);
+            break;
+            case battery.percentRemaining <= 0.5:
+            return (<Icon type='FontAwesome' name='battery-half'/>);
+            break;
+            case battery.percentRemaining < 1.0:
+            return (<Icon type='FontAwesome' name='battery-three-quarters'/>);
+            break;
+            default:
+            return (<Icon type='FontAwesome' name='battery-full'/>);
+        }
+    }
+
     render() {
         const { marker } = this.props
         return (
           <Container>
             <MapView
-                style={{ flex: 1 }}
+                style={{ height: 200 }}
                 initialRegion={{
                     latitude: marker.location.latitude,
                     longitude: marker.location.longitude,
@@ -41,16 +62,41 @@ class VehicleScreen extends Component {
                         </Animated.View>
                     </MapView.Marker>
                 </MapView>
-                <Content>
+                <Content style={styles.content}>
                     <Text style={styles.subheader}>RESERVE THIS DRIB</Text>
-                    <Text style={styles.header}>{marker.title}</Text>
+                    <Text style={styles.header}>{`${marker.info.make} ${marker.info.model} ${marker.info.year}`}</Text>
                 <Grid>
-                  <Col style={{ backgroundColor: '#635DB7', height: 200 }}> 
-                    <Text>{`${marker.info.make} \n ${marker.info.model} ${marker.info.year}`}</Text>
-                  </Col>
-                  <Col style={{ backgroundColor: '#00CE9F', height: 200 }}>
-                    <Text> {marker.battery.percentRemaining}</Text>
-                  </Col>
+                  <Row>
+                    <Col>
+                        <Badge style={styles.badge}> 
+                        <Icon type="FontAwesome" name="car" style={{fontSize: 40, margin: 'auto', textAlign: 'center'}} />
+                        </Badge>
+                    </Col>
+                    <Col>
+                        <Row>
+                            { this.renderBatteryRemaining(marker.battery) }
+                            <Text style={{lineHeight: 30, marginLeft: 10}}>{`${parseFloat(marker.battery.percentRemaining).toFixed(2)}%\n`}</Text>
+                           
+                        </Row>
+                        <Row>
+                            <Text>{`Available range: ${parseFloat(marker.battery.range)} mi`}</Text>
+                        </Row>
+                        <Row>
+                        <Text>{marker.vin}</Text>
+                        </Row>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col style={{ backgroundColor: '#635DB7' }}> 
+                        <Button>Honk Horn</Button>
+                    </Col>
+                    <Col style={{ backgroundColor: '#00CE9F' }}>
+                        <Button>Flash Lights</Button>
+                    </Col>
+                    <Col style={{ backgroundColor: '#00CE9F' }}>
+                        <Button>Map to Drib</Button>
+                    </Col>
+                  </Row>
                 </Grid>
             </Content>
           </Container>
@@ -59,8 +105,19 @@ class VehicleScreen extends Component {
 }
 
 const styles = StyleSheet.create({
+    content: {
+        backgroundColor: '#fff'
+    },
+    badge: { 
+        height: 100, 
+        width: 100, 
+        borderRadius: 50,
+        backgroundColor: 'lightgrey',
+        margin: 10, 
+    },
     header: {
-        fontSize: 40,
+        fontSize: 30,
+        fontWeight: 'bold',
         textAlign: 'center',
         color: '#000',
         backgroundColor: '#fff'
