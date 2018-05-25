@@ -8,7 +8,7 @@ import { Actions } from 'react-native-router-flux';
 
 const handleLogin = async (e) => {
   // get user token
-  const user = await fetch('https://c39f00b9.ngrok.io/user', {
+  const user = await fetch('https://b6301cca.ngrok.io/user', {
     method: 'post',
     headers: {
       'content-type': 'application/json'
@@ -37,6 +37,7 @@ const LoginScreen = () => {
     // </View>
     <Container>
       <Content>
+        <Header> <Text style={styles.header}>D R I B</Text> </Header>
         <Form>
           <Item>
             <Input placeholder="Username" />
@@ -45,7 +46,7 @@ const LoginScreen = () => {
             <Input placeholder="Password" />
           </Item>
         </Form>
-        <Button full primary onPress={() => handleLogin()}>
+        <Button full style={{backgroundColor: 'purple'}} onPress={() => handleLogin()}>
           <Text>Login</Text>
         </Button>
       </Content>
@@ -65,6 +66,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     margin: 10,
     color: '#ffffff',
+  },
+  header: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#000',
+    backgroundColor: '#fff'
   },
 });
 

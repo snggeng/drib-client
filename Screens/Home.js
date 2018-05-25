@@ -8,7 +8,7 @@ import {
   AsyncStorage,
 } from 'react-native';
 import ReactNativeComponentTree from 'react-native/Libraries/Renderer/shims/ReactNativeComponentTree';
-import { Container, Header, Left, Body, Right, Title } from 'native-base';
+import { Container, Header, Left, Body, Right, Title, Toast } from 'native-base';
 import { MapView } from 'expo';
 import { Actions } from 'react-native-router-flux';
 
@@ -108,6 +108,7 @@ class HomeScreen extends Component {
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
       },
+      showToast: false
     }
   }
 
@@ -132,7 +133,7 @@ class HomeScreen extends Component {
       console.log(e)
     }
 
-    const vehicles = await fetch('https://c39f00b9.ngrok.io' + '/vehicles', {
+    const vehicles = await fetch('https://b6301cca.ngrok.io' + '/vehicles', {
       headers: {
         'content-type': 'application/json',
         'authorization': `Bearer ${token}`
@@ -154,13 +155,21 @@ class HomeScreen extends Component {
   }
 
   handlePress = async (marker) => {
+    // Show toast
+    Toast.show({
+      text: "Fetching Car Information...",
+      buttonText: "Okay",
+      duration: 3000
+    })
     // pass marker into vehicle info screen
-    const vehicle = await fetch('https://c39f00b9.ngrok.io' + '/vehicles/' + marker.id, {
+    const vehicle = await fetch('https://b6301cca.ngrok.io' + '/vehicles/' + marker.id, {
       headers: {
         authorization: `bearer ${await AsyncStorage.getItem('token')}`
       },
     }).then(res => res.json())
+
     console.log(vehicle)
+    // Navigate to vehicle screen
     Actions.vehicle({ marker: vehicle })
   }
 
@@ -173,6 +182,9 @@ class HomeScreen extends Component {
         </Text>
         <Text style={styles.subheader}>
           Find Your Ride
+        </Text>
+        <Text style={styles.subsubheader}>
+          Tap on a marker to view a drib's information, and tap on the tooltip to make a reservation.
         </Text>
         <MapView
           ref={map => {this.map = map}}
@@ -229,6 +241,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#fff',
     backgroundColor: 'purple'
+  },
+  subsubheader: {
+    fontSize: 12,
+    textAlign: 'center',
+    color: '#fff',
+    backgroundColor: 'grey'
   },
   markerWrap: {
     alignItems: "center",

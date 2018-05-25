@@ -6,7 +6,7 @@ import {
   Text,
   AsyncStorage,
 } from 'react-native';
-import { Container, Header, Content, Button, Item, Icon, Badge } from 'native-base';
+import { Container, Header, Content, Button, Item, Icon, Badge, Toast } from 'native-base';
 import { Col, Row, Grid } from 'react-native-easy-grid';
 import { MapView } from 'expo';
 import { Actions } from 'react-native-router-flux';
@@ -38,9 +38,14 @@ class VehicleScreen extends Component {
     handleReserve = async () => {
         const token = await AsyncStorage.getItem('token')
         const { marker } = this.props
+        // Show toast
+        Toast.show({
+            text: "Vehicle reserved!",
+            buttonText: "Okay",
+            duration: 3000
+        })
         // create reservation
-        console.log('vid', marker.id)
-        const rid = await fetch('https://c39f00b9.ngrok.io/vehicles/' + marker.id + '/reservation', {
+        const rid = await fetch('https://b6301cca.ngrok.io/vehicles/' + marker.id + '/reservation', {
             headers: {
                 authorization: `bearer ${token}`
             },
@@ -49,6 +54,7 @@ class VehicleScreen extends Component {
                 vehicleId: marker.id
             })
         }).then(res => res.json())
+        // navigate to reservation
         Actions.reservation({ marker, rid })
         console.log('rid', rid)
     }
@@ -91,23 +97,12 @@ class VehicleScreen extends Component {
                         <Icon type="FontAwesome" name="car" style={{fontSize: 40, margin: 'auto', textAlign: 'center'}} />
                         </Badge>
                     </Col>
-                    <Col>
-                        {/* <Row>
-                            { this.renderBatteryRemaining(marker.battery) }
-                            <Text style={{lineHeight: 30, marginLeft: 10}}>{`${parseFloat(marker.battery.percentRemaining).toFixed(2)}%\n`}</Text>
-                           
-                        </Row>
-                        <Row>
-                            <Text>{`Available range: ${parseFloat(marker.battery.range)} mi`}</Text>
-                        </Row> */}
-                        <Row>
-                        <Text>{marker.vin}</Text>
-                        </Row>
+                    <Col style={{paddingTop: 15}}>
+                        <Icon type='FontAwesome' name='barcode' /><Text>Vin: {marker.vin}</Text>
+                        <Icon type='FontAwesome' name='tachometer'/><Text>Distance: {marker.odometer.distance}</Text>
                     </Col>
                   </Row>
-                  <Row>
-                  <Button primary full onPress={this.handleReserve}><Text>Reserve</Text></Button>
-                  </Row>
+                  <Button primary full style={{backgroundColor: 'purple'}} onPress={this.handleReserve}><Text style={{color: 'white'}}>Reserve</Text></Button>
                 </Grid>
             </Content>
           </Container>
@@ -137,7 +132,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         textAlign: 'center',
         color: '#fff',
-        backgroundColor: 'purple'
+        backgroundColor: "darkorchid"
     },
     markerWrap: {
         alignItems: "center",
