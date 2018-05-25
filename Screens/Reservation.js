@@ -11,7 +11,7 @@ import { Col, Row, Grid } from 'react-native-easy-grid';
 import { MapView } from 'expo';
 import { Actions } from 'react-native-router-flux';
 
-class VehicleScreen extends Component {
+class ReservationScreen extends Component {
     constructor(props) {
         super(props)
     };
@@ -35,54 +35,73 @@ class VehicleScreen extends Component {
         }
     }
 
-    handleReserve = async () => {
-        const token = await AsyncStorage.getItem('token')
-        const { marker } = this.props
-        // create reservation
-        console.log('vid', marker.id)
-        const rid = await fetch('https://c39f00b9.ngrok.io/vehicles/' + marker.id + '/reservation', {
+          // start reservation
+    handleStartReservation = async () => {
+        const {rid, marker } = this.props
+        console.log(`marker ${marker.id} rid ${rid.id}`)
+        let token = await AsyncStorage.getItem('token')
+        const response = await fetch('https://c39f00b9.ngrok.io/vehicles/' + marker.id + '/reservation/' + rid.id, {
             headers: {
+                'content-type': 'application/json',
+                authorization: `bearer ${token}`
+            },
+            method: 'put',
+            body: JSON.stringify({action: "START"})
+        }).then(res => res.json())
+        console.log('final res', response)
+    }
+
+    handleStopReservation = async () => {
+        const {rid, marker } = this.props
+        let token = await AsyncStorage.getItem('token')
+        const response = await fetch('https://c39f00b9.ngrok.io/vehicles/' + marker.id + '/reservation/' + rid.id, {
+            headers: {
+                'content-type': 'application/json',
+                authorization: `bearer ${token}`
+            },
+            method: 'put',
+            body: JSON.stringify({action: "END"})
+        }).then(res => res.json())
+        console.log('final res', response)
+    }
+
+    handleLock = async () => {
+        const {rid, marker } = this.props
+        let token = await AsyncStorage.getItem('token')
+        const lockRes = await fetch('https://c39f00b9.ngrok.io/vehicles/' + marker.id + '/action', {
+            headers: {
+                'content-type': 'application/json',
                 authorization: `bearer ${token}`
             },
             method: 'post',
             body: JSON.stringify({
-                vehicleId: marker.id
+                action: "LOCK"
             })
         }).then(res => res.json())
-        Actions.reservation({ marker, rid })
-        console.log('rid', rid)
+        console.log(lockRes)
+    }
+
+    handleUnlock = async () => {
+        const {rid, marker } = this.props
+        let token = await AsyncStorage.getItem('token')
+        const lockRes = await fetch('https://c39f00b9.ngrok.io/vehicles/' + marker.id + '/action', {
+            headers: {
+                'content-type': 'application/json',
+                authorization: `bearer ${token}`
+            },
+            method: 'post',
+            body: JSON.stringify({
+                action: "UNLOCK"
+            })
+        }).then(res => res.json())
+        console.log(lockRes)
     }
 
     render() {
-        const { marker } = this.props
+        const { marker, rid } = this.props
         return (
           <Container>
-            <MapView
-                style={{ height: 200 }}
-                initialRegion={{
-                    latitude: marker.location.latitude,
-                    longitude: marker.location.longitude,
-                    latitudeDelta: 0.0922,
-                    longitudeDelta: 0.0421,
-                }}
-                showsMyLocationButton={true}
-                showsUserLocation={true}
-                >
-                    <MapView.Marker
-                        key={1}
-                        coordinate={marker.location}
-                        title={marker.info.make}
-                        marker={marker}
-                        description={`${marker.info.model} ${marker.info.year}`}
-                    >
-                        <Animated.View style={styles.markerWrap}>
-                        <Animated.View style={styles.ring} />
-                        <View style={styles.marker}/>
-                        </Animated.View>
-                    </MapView.Marker>
-                </MapView>
                 <Content style={styles.content}>
-                    <Text style={styles.subheader}>RESERVE THIS DRIB</Text>
                     <Text style={styles.header}>{`${marker.info.make} ${marker.info.model} ${marker.info.year}`}</Text>
                 <Grid>
                   <Row>
@@ -92,21 +111,27 @@ class VehicleScreen extends Component {
                         </Badge>
                     </Col>
                     <Col>
-                        {/* <Row>
-                            { this.renderBatteryRemaining(marker.battery) }
-                            <Text style={{lineHeight: 30, marginLeft: 10}}>{`${parseFloat(marker.battery.percentRemaining).toFixed(2)}%\n`}</Text>
-                           
-                        </Row>
-                        <Row>
-                            <Text>{`Available range: ${parseFloat(marker.battery.range)} mi`}</Text>
-                        </Row> */}
                         <Row>
                         <Text>{marker.vin}</Text>
                         </Row>
                     </Col>
                   </Row>
                   <Row>
-                  <Button primary full onPress={this.handleReserve}><Text>Reserve</Text></Button>
+                  <Button large onPress={this.handleStartReservation}><Text>Start Trip</Text></Button>
+                  <Button large onPress={this.handleStopReservation}><Text>Stop Trip</Text></Button>
+                  <Button large onPress={this.handleLock}><Text>Lock</Text></Button>
+                  <Button large onPress={this.handleUnlock}><Text>Unlock</Text></Button>
+                  </Row>
+                  <Row>
+                    <Col style={{ backgroundColor: '#635DB7' }}> 
+                        <Button><Text>Honk Horn</Text></Button>
+                    </Col>
+                    <Col style={{ backgroundColor: '#00CE9F' }}>
+                        <Button><Text>Flash Lights</Text></Button>
+                    </Col>
+                    <Col style={{ backgroundColor: '#00CE9F' }}>
+                        <Button><Text>Map to Drib</Text></Button>
+                    </Col>
                   </Row>
                 </Grid>
             </Content>
@@ -160,4 +185,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default VehicleScreen;
+export default ReservationScreen;

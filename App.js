@@ -4,12 +4,7 @@ import { StyleSheet, Text } from 'react-native';
 import LoginScreen from './Screens/Login';
 import HomeScreen from './Screens/Home';
 import VehicleScreen from './Screens/Vehicle';
-
-const TabIcon = ({ selected, title }) => {
-  return (
-    <Text style={{color: selected ? 'red' :'black'}}>{title}</Text>
-  );
-}
+import ReservationScreen from './Screens/Reservation';
 
 export default class App extends React.Component {
   async componentWillMount() {
@@ -37,6 +32,11 @@ export default class App extends React.Component {
               key="vehicle"
               component={VehicleScreen}
               title="Vehicle Information"
+            />
+            <Scene
+              key="reservation"
+              component={ReservationScreen}
+              title="Reservation Information"
             />
         </Scene>
       </Router>

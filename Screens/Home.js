@@ -5,6 +5,7 @@ import {
   View,
   Animated,
   TouchableHighlight,
+  AsyncStorage,
 } from 'react-native';
 import ReactNativeComponentTree from 'react-native/Libraries/Renderer/shims/ReactNativeComponentTree';
 import { Container, Header, Left, Body, Right, Title } from 'native-base';
@@ -17,88 +18,90 @@ export const getCurrentLocation = () => {
   });
 };
 
+// {
+//           id: 123,
+//           odometer: {
+//               distance: 123
+//           },
+//           vin: "5XXGN4A72EG347600",
+//           info: {
+//               make: "TESLA",
+//               model: "Model S",
+//               year: 2014
+//           },
+//           location: {
+//               latitude: 37.40113,
+//               longitude: -122.0577
+//           },
+//           battery: {
+//               percentRemaining: 0.3,
+//               range: 40.5
+//           }
+//       }, {
+//           id: 124,
+//           odometer: {
+//               distance: 124
+//           },
+//           vin: "5XXGSH2A72EG351230",
+//           info: {
+//               make: "HONDA",
+//               model: "Odyssey",
+//               year: 2015
+//           },
+//           location: {
+//               latitude: 37.40501,
+//               longitude: -122.0771
+//           },
+//           battery: {
+//               percentRemaining: 0.5,
+//               range: 40.5
+//           }
+//       }, {
+//           id: 125,
+//           odometer: {
+//               distance: 125
+//           },
+//           vin: "5XXJIJ2A72GS312524",
+//           info: {
+//               make: "BMW",
+//               model: "X5",
+//               year: 2018
+//           },
+//           location: {
+//               latitude: 37.40501,
+//               longitude: -122.0500
+//           },
+//           battery: {
+//               percentRemaining: 0.7,
+//               range: 45.5
+//           }
+//       }, {
+//           id: 126,
+//           odometer: {
+//               distance: 126
+//           },
+//           vin: "5XXREJ2Y72DS344433",
+//           info: {
+//               make: "CHRYSLER",
+//               model: "Pacifica",
+//               year: 2018
+//           },
+//           location: {
+//               latitude: 37.40123,
+//               longitude: -122.0587
+//           },
+//           battery: {
+//               percentRemaining: 0.9,
+//               range: 50.5
+//           }
+//       }
+
 class HomeScreen extends Component {
   constructor(props) {
     super(props)
     this.map = null;
     this.state = {
-      vehicles: [{
-          id: 123,
-          odometer: {
-              distance: 123
-          },
-          vin: "5XXGN4A72EG347600",
-          info: {
-              make: "TESLA",
-              model: "Model S",
-              year: 2014
-          },
-          location: {
-              latitude: 37.40113,
-              longitude: -122.0577
-          },
-          battery: {
-              percentRemaining: 0.3,
-              range: 40.5
-          }
-      }, {
-          id: 124,
-          odometer: {
-              distance: 124
-          },
-          vin: "5XXGSH2A72EG351230",
-          info: {
-              make: "HONDA",
-              model: "Odyssey",
-              year: 2015
-          },
-          location: {
-              latitude: 37.40501,
-              longitude: -122.0771
-          },
-          battery: {
-              percentRemaining: 0.5,
-              range: 40.5
-          }
-      }, {
-          id: 125,
-          odometer: {
-              distance: 125
-          },
-          vin: "5XXJIJ2A72GS312524",
-          info: {
-              make: "BMW",
-              model: "X5",
-              year: 2018
-          },
-          location: {
-              latitude: 37.40501,
-              longitude: -122.0500
-          },
-          battery: {
-              percentRemaining: 0.7,
-              range: 45.5
-          }
-      }, {
-          id: 126,
-          odometer: {
-              distance: 126
-          },
-          vin: "5XXREJ2Y72DS344433",
-          info: {
-              make: "CHRYSLER",
-              model: "Pacifica",
-              year: 2018
-          },
-          location: {
-              latitude: 37.40123,
-              longitude: -122.0587
-          },
-          battery: {
-              percentRemaining: 0.9,
-              range: 50.5
-          }
-      }],
+      vehicles: [],
       region: {
           latitude: null,
           longitude: null,
@@ -109,7 +112,7 @@ class HomeScreen extends Component {
   }
 
   async componentDidMount() {
-    return await getCurrentLocation().then( async (position) => {
+    await getCurrentLocation().then( async (position) => {
       if (position) {
         await this.setState({
           region: {
@@ -121,6 +124,23 @@ class HomeScreen extends Component {
         });
       }
     });
+    let token
+    try {
+      token = await AsyncStorage.getItem('token')
+      console.log(token)
+    } catch(e) {
+      console.log(e)
+    }
+
+    const vehicles = await fetch('https://c39f00b9.ngrok.io' + '/vehicles', {
+      headers: {
+        'content-type': 'application/json',
+        'authorization': `Bearer ${token}`
+      }
+    }).then(res => res.json())
+    console.log(vehicles)
+    await this.setState({vehicles})
+    console.log(this.state)
   }
 
   handleCenter = () => {
@@ -133,9 +153,15 @@ class HomeScreen extends Component {
     })
   }
 
-  handlePress = (marker) => {
+  handlePress = async (marker) => {
     // pass marker into vehicle info screen
-    Actions.vehicle({ marker })
+    const vehicle = await fetch('https://c39f00b9.ngrok.io' + '/vehicles/' + marker.id, {
+      headers: {
+        authorization: `bearer ${await AsyncStorage.getItem('token')}`
+      },
+    }).then(res => res.json())
+    console.log(vehicle)
+    Actions.vehicle({ marker: vehicle })
   }
 
   render() {
@@ -146,7 +172,7 @@ class HomeScreen extends Component {
           D R I B
         </Text>
         <Text style={styles.subheader}>
-          Enable Location Services
+          Find Your Ride
         </Text>
         <MapView
           ref={map => {this.map = map}}
@@ -162,7 +188,9 @@ class HomeScreen extends Component {
           showsUserLocation={true}
         >
         {/* {this.state.vehicles.map((v, i) => (<Text>{v.vin}</Text>))} */}
-        {this.state.vehicles.map((marker, index) => (
+        {this.state.vehicles
+            .filter(v => !v.reserved)
+            .map((marker, index) => (
           <MapView.Marker
             key={index}
             id={index}
