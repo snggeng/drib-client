@@ -30,9 +30,9 @@ class SummaryScreen extends Component {
                 </Header>
                 <Card style={{padding: 10}}>
                     <Text>START</Text>
-                    <Text>Some date</Text>
+                    <Text>Palo Alto</Text>
                     <Text>END</Text>
-                    <Text>Some date</Text>
+                    <Text>Mountain View</Text>
                 </Card>
                 {/* <Button full style={{backgroundColor: 'purple'}} onPress={this.handleStopTrip}>
                     <Text style={{color: 'white'}}>End My Trip</Text>
